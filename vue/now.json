@@ -3,5 +3,8 @@
   "name": "vue",
   "builds": [
     {"src": "package.json", "use": "@now/static-build"}
+  ],
+  "routes": [
+    {"src": "/(js|css|img)", "dest": "/404.html", "status": 404}
   ]
 }
