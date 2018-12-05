@@ -15,8 +15,8 @@ module.exports = async (req, res) => {
 
   // Calculate boot costs.
   console.time("Import vue, invoked (again) " + invoked);
-  const Vue = require("vue");
-  const { createRenderer } = require("vue-server-renderer");
+  const Vue = require("vue/dist/vue.runtime.min");
+  const { createRenderer } = require("vue-server-renderer/build");
   console.timeEnd("Import vue, invoked (again) " + invoked);
 
   // Fetch if we have the query param.
