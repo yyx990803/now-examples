@@ -5,6 +5,7 @@ const render = require("./render");
 
 // If this is 0, the lambda is cold. 😉
 let invoked = 0;
+let renderer = null;
 
 module.exports = async (req, res) => {
   /**
@@ -28,14 +29,16 @@ module.exports = async (req, res) => {
   }
 
   // Get the render method.
-  const { renderToString } = createRenderer({
-    runInNewContext: false // Recommended by the Vue SSR documentation
-  });
+  if (!renderer) {
+    renderer = createRenderer({
+      runInNewContext: false // Recommended by the Vue SSR documentation
+    });
+  }
 
   // Just put it.
   res.writeHead(200, { "content-type": "text/html" });
   res.end(
-    await renderToString(
+    await renderer.renderToString(
       new Vue({
         data: () => Object.assign({
           active: !queryParams.fetch
