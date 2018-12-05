@@ -28,7 +28,9 @@ module.exports = async (req, res) => {
   }
 
   // Get the render method.
-  const { renderToString } = createRenderer();
+  const { renderToString } = createRenderer({
+    runInNewContext: false // Recommended by the Vue SSR documentation
+  });
 
   // Just put it.
   res.writeHead(200, { "content-type": "text/html" });
