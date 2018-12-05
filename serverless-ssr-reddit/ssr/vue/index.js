@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     mock = await rawMock.json();
   }
 
-  // Get the render method.
+  // Create a cached renderer
   if (!renderer) {
     renderer = createRenderer({
       runInNewContext: false // Recommended by the Vue SSR documentation
