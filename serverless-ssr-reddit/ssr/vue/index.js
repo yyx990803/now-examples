@@ -24,7 +24,9 @@ module.exports = async (req, res) => {
   const queryParams = getQueryParams(req);
 
   if (queryParams.fetch) {
-    const rawMock = await fetch("https://reddit.com/r/" + queryParams.fetch + ".json");
+    const rawMock = await fetch(
+      "https://reddit.com/r/" + queryParams.fetch + ".json"
+    );
     mock = await rawMock.json();
   }
 
@@ -40,12 +42,13 @@ module.exports = async (req, res) => {
   res.end(
     await renderer.renderToString(
       new Vue({
-        data: () => Object.assign({
-          active: !queryParams.fetch
-        }, mock),
-        render,
-      }),
-    ),
+        data: () => ({
+          ...mock,
+          isHomePage: !queryParams.fetch
+        }),
+        render
+      })
+    )
   ),
     // This has been invoked.
     invoked++;
