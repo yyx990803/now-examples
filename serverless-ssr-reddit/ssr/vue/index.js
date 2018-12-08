@@ -5,6 +5,7 @@ const render = require("./render");
 
 // If this is 0, the lambda is cold. 😉
 let invoked = 0;
+let renderer = null;
 
 module.exports = async (req, res) => {
   /**
@@ -15,32 +16,39 @@ module.exports = async (req, res) => {
 
   // Calculate boot costs.
   console.time("Import vue, invoked (again) " + invoked);
-  const Vue = require("vue");
-  const { createRenderer } = require("vue-server-renderer");
+  const Vue = require("vue/dist/vue.runtime.min");
+  const { createRenderer } = require("vue-server-renderer/build");
   console.timeEnd("Import vue, invoked (again) " + invoked);
 
   // Fetch if we have the query param.
   const queryParams = getQueryParams(req);
 
   if (queryParams.fetch) {
-    const rawMock = await fetch("https://reddit.com/r/" + queryParams.fetch + ".json");
+    const rawMock = await fetch(
+      "https://reddit.com/r/" + queryParams.fetch + ".json"
+    );
     mock = await rawMock.json();
   }
 
-  // Get the render method.
-  const { renderToString } = createRenderer();
+  // Create a cached renderer
+  if (!renderer) {
+    renderer = createRenderer({
+      runInNewContext: false // Recommended by the Vue SSR documentation
+    });
+  }
 
   // Just put it.
   res.writeHead(200, { "content-type": "text/html" });
   res.end(
-    await renderToString(
+    await renderer.renderToString(
       new Vue({
-        data: () => Object.assign({
-          active: !queryParams.fetch
-        }, mock),
-        render,
-      }),
-    ),
+        data: () => ({
+          ...mock,
+          isHomePage: !queryParams.fetch
+        }),
+        render
+      })
+    )
   ),
     // This has been invoked.
     invoked++;
